@@ -1,3 +1,4 @@
-= Gallery =
+Gallery
+=======
 
-To do..
+Under development...
