@@ -29,17 +29,18 @@ if (!$node)
 }
 
 // file?
-if (get_class($node) == "file")
+if (get_class($node) == "hsw\\gallery\\file")
 {
+	// TODO: use mw and mh parameters
+	$node->image->output_image($node->image->generate_image(200, 400));
+	die;
+
 	// TODO
 	die("File handling is under development..");
 }
 
 // folder
+$node->load_contents();
 
-
-
-
-
-
-var_dump(exif::get_exif_data($src_path."/2012-07-13 Besøk i Stavern/DSC_5990.JPG"));
+// load template
+require "template.php";
