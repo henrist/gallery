@@ -330,8 +330,9 @@ class file
 		}
 	}
 
-	public function getname()
+	public function getname($extension = false)
 	{
+		if ($extension) return basename($this->path);
 		return file::strip_extension(basename($this->path));
 	}
 
@@ -399,7 +400,7 @@ class image
 		return preg_match("/\\.(jpe?g|gif|png)$/i", $path);
 	}
 
-	public function get_url($max_width = 200, $max_height = 300)
+	public function get_url($max_width = 300, $max_height = 480)
 	{
 		return 'index.php?path='.urlencode($this->file->get_url()).'&mw='.$max_width.'&mh='.$max_height;
 	}
@@ -416,7 +417,7 @@ class image
 		return $this->exif;
 	}
 
-	public function get_thumb($max_width = 200, $max_height = 300, $quality = 85)
+	public function get_thumb($max_width = 300, $max_height = 480, $quality = 80)
 	{
 		return new image_thumb($this, $max_width, $max_height, $quality);
 	}

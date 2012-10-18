@@ -6,7 +6,7 @@
 
 namespace hsw\gallery;
 
-// ini_set("memory_imit", "256M");
+ini_set("memory_limit", "256M");
 
 require "objects.php";
 require "config.php";
@@ -46,7 +46,9 @@ if (get_class($node) == "hsw\\gallery\\file")
 	}
 
 	// TODO: use mw and mh parameters
-	$node->image->get_thumb()->output(200, 400);
+	$mw = isset($_GET['mw']) && is_numeric($_GET['mw']) && $_GET['mw'] > 0 && $_GET['mw'] < 3000 ? $_GET['mw'] : 300;
+	$mh = isset($_GET['mh']) && is_numeric($_GET['mh']) && $_GET['mh'] > 0 && $_GET['mh'] < 3000 ? $_GET['mh'] : 480;
+	$node->image->get_thumb($mw, $mh)->output();
 	die;
 
 	// TODO

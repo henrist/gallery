@@ -38,3 +38,6 @@ TODO
 * Viewing EXIF-data
 * Error handling
 * Documentation (for code)
+* Support symlink paths
+* Pagination or another smart solution (viewing images as scrolled?)
+* Folder/file filtering

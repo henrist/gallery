@@ -4,20 +4,18 @@ namespace hsw\gallery;
 
 if (!class_exists("hsw\gallery\gallery")) die("Are you sure you are at the right address?");
 
-?>
+echo '
 <!DOCTYPE html>
 <html>
 <head>
 	<title>HSw Gallery</title>
-	<style>
-
-	</style>
+	<link type="text/css" href="gallery.css" media="all" rel="stylesheet" />
 	<script>
 	</script>
 </head>
 <body>
-	<h1>Gallery</h1>
-<?php
+	<h1>HSw Gallery</h1>';
+
 
 // generate hierarchy list
 $hierarchy = $node->get_parents();
@@ -29,66 +27,98 @@ foreach ($hierarchy as $folder)
 $hier = implode(" &raquo; ", $hier);
 
 echo '
-	<p>Hierarchy: '.$hier.'</p>
-	<p>Folders:</p>';
+	<p>Hierarchy: '.$hier.'</p>';
 
-if (count($node->folders) == 0) {
+
+
+if (count($node->folders) > 0)
+{
 	echo '
-	<p>There are no subfolders here.</p>';
-} else {
-	$i = 0;
+	<ul class="folders">';
+
 	foreach ($node->folders as $folder)
 	{
-		if ($i++ == 30)
-		{
-			echo '
-	<p>Limited to 30 entries while testing...</p>';
-			break;
-		}
+		$img_url = 'resources/no-image.png';
+		$img_alt = '';
 
 		$folderimg = $folder->get_image();
-		
-		$t = 'none';
 		if ($folderimg)
 		{
 			$thumb = $folderimg->get_thumb();
-			$t = '<img src="'.htmlspecialchars($thumb->get_url()).'" alt="'.htmlspecialchars($folderimg->file->getname()).'" />';
+			$img_url = $thumb->get_url();
+			$img_alt = $folderimg->file->getname();
 		}
 
 		echo '
-	<p>Folder: <a href="'.htmlspecialchars($folder->get_link()).'">'.htmlspecialchars($folder->getname()).'</a> - thumb: '.$t.'</p>';
+		<li><a href="'.htmlspecialchars($folder->get_link()).'">
+				<img src="'.htmlspecialchars($img_url).'" alt="'.htmlspecialchars($img_alt).'" />
+				<span>'.htmlspecialchars($folder->getname()).'</span>
+		</a></li>';
 	}
+
+	echo '
+	</ul>';
 }
 
-echo '
-	<p>Files:</p>';
 
+
+// no files to show?
 if (count($node->files) == 0) {
 	echo '
-	<p>There are no files here.</p>';
-} else {
+	<div class="files_none">
+		<p>There are no files here.</p>
+	</div>';
+}
+
+// show the files
+else
+{
+	echo '
+	<ul class="files">';
+
 	$i = 0;
 	foreach ($node->files as $file)
 	{
-		if ($i++ == 10)
-		{
-			echo '
-	<p>Limited to 10 entries while testing...</p>';
-			break;
-		}
+		if ($i++ == 50) break;
 
-		$t = 'none';
+		$img_url = 'resources/no-image.png';
+		$img_alt = $file->getname();
+		$link = $file->get_link();
+		$fullsize = '';
+
 		if ($file->image)
 		{
 			$thumb = $file->image->get_thumb();
-			$t = '<img src="'.htmlspecialchars($thumb->get_url()).'" alt="'.htmlspecialchars($file->getname()).'" />';
+			$img_url = $thumb->get_url();
+
+			// default link is smaller size than original
+			$fullsize = '
+				<span class="fullsizelink"><a href="'.htmlspecialchars($link).'">Original</a></span>';
+			$link = $file->image->get_thumb(1200, 1200, 90)->get_url();
 		}
 
+		echo '<!--
+		--><li><a href="'.htmlspecialchars($link).'">
+				<img src="'.htmlspecialchars($img_url).'" alt="'.htmlspecialchars($img_alt).'" />
+				<span>'.htmlspecialchars($file->getname($file->image == false)).' ('.$file->get_size().')</span>
+		</a>'.$fullsize.'</li>';
+	}
+
+	echo '
+	</ul>';
+
+	if ($i == 50)
+	{
 		echo '
-	<p>File: <a href="'.htmlspecialchars($file->get_link()).'">'.htmlspecialchars($file->getname()).'</a> ('.$file->get_size().') - thumb: '.$t.'</p>';
+	<p>Limited to 50 entries while testing...</p>';
 	}
 }
 
-?>
+
+
+echo '
+	<footer>
+		<p><a href="http://github.com/henrist/gallery">HSw Gallery</a> - made by <a href="http://hsw.no">Henrik Steen</a></p>
+	</footer>
 </body>
-</html>
+</html>';
