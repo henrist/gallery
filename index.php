@@ -31,8 +31,22 @@ if (!$node)
 // file?
 if (get_class($node) == "hsw\\gallery\\file")
 {
+	// no image?
+	if (!$node->image) die("No image.");
+
+	// has cache?
+	if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))
+	{
+		$m = filemtime($node->path);
+		if (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) == $m)
+		{
+			header("Last-Modified: ".gmdate(DATE_RFC822, $m), true, 304);
+			die;
+		}
+	}
+
 	// TODO: use mw and mh parameters
-	$node->image->output_image($node->image->generate_image(200, 400));
+	$node->image->get_thumb()->output(200, 400);
 	die;
 
 	// TODO

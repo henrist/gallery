@@ -10,6 +10,7 @@ class gallery
 {
 	public static $src_path;
 	public static $src_url;
+	public static $cache_path;
 
 	public static function init()
 	{
@@ -17,6 +18,21 @@ class gallery
 		if (!exif::check_exif())
 		{
 			gallery::error("Exif not enabled.");
+		}
+
+		// check for cache directory
+		if (self::$cache_path)
+		{
+			if (!file_exists(self::$cache_path))
+			{
+				// TODO error handling
+				self::cache_dir_create(self::$cache_path);
+			} else {
+				if (!is_dir(self::$cache_path)) {
+					// disable cache
+					self::$cache_path = null;
+				}
+			}
 		}
 	}
 
@@ -46,6 +62,12 @@ class gallery
 
 		// unknown type
 		return false;
+	}
+
+	public static function cache_dir_create($dir)
+	{
+		mkdir($dir);
+		chmod($dir, 0777);
 	}
 }
 
@@ -129,7 +151,7 @@ class folder
 	public $is_root_folder = false;
 
 	/** @var image */
-	private $thumbnail;
+	private $folder_image;
 
 	public function __construct($path)
 	{
@@ -193,15 +215,15 @@ class folder
 	}
 
 	/**
-	 * Get image for thumbnail for this folder
+	 * Get image representing this folder
 	 * @return image
 	 */
-	public function get_thumbnail()
+	public function get_image()
 	{
 		// cache?
-		if ($this->thumbnail !== null) return $this->thumbnail;
+		if ($this->folder_image !== null) return $this->folder_image;
 
-		$this->thumbnail = false;
+		$this->folder_image = false;
 		$dir = $this->path;
 		
 		// simply pick the first image inside this folder
@@ -220,7 +242,7 @@ class folder
 				if (is_file($p) && image::is_image_type($p))
 				{
 					$f = new file($p);
-					$this->thumbnail = $f->image;
+					$this->folder_image = $f->image;
 					closedir($dh);
 					break 2;
 				}
@@ -234,7 +256,7 @@ class folder
 			$dir = $ds;
 		}
 
-		return $this->thumbnail;
+		return $this->folder_image;
 	}
 
 	/**
@@ -379,7 +401,7 @@ class image
 
 	public function get_url($max_width = 200, $max_height = 300)
 	{
-		return 'index.php?path='.$this->file->get_url().'&mw='.$max_width.'&mh='.$max_height;
+		return 'index.php?path='.urlencode($this->file->get_url()).'&mw='.$max_width.'&mh='.$max_height;
 	}
 
 	public function load()
@@ -394,16 +416,64 @@ class image
 		return $this->exif;
 	}
 
-	public function generate_image($max_width, $max_height, $quality = 85)
+	public function get_thumb($max_width = 200, $max_height = 300, $quality = 85)
 	{
-		$src_img = $this->load();
+		return new image_thumb($this, $max_width, $max_height, $quality);
+	}
+
+	public function output_image($data)
+	{
+		$cache_time = 86400*14;
+		header("Cache-Control: public, max-age=$cache_time, pre-check=$cache_time");
+		header("Pragma: public");
+		header("Expires: ".gmdate(DATE_RFC822, time()+$cache_time));
+		header("Last-Modified: ".gmdate(DATE_RFC822, filemtime($this->file->path)));
+
+		header("Content-Type: image/jpeg");
+		header("Content-Size: ".strlen($data));
+		echo $data;
+	}
+}
+
+/**
+ * Handling image thumbnails
+ */
+class image_thumb
+{
+	/** @var image */
+	public $image;
+	public $max_width;
+	public $max_height;
+	public $quality;
+	private $cache_file;
+
+	public function __construct(image $image, $max_width, $max_height, $quality)
+	{
+		$this->image = $image;
+		$this->max_width = $max_width;
+		$this->max_height = $max_height;
+		$this->quality = $quality;
+	}
+
+	public function generate($cache = true)
+	{
+		// check if thumb is cached
+		if ($cache)
+		{
+			$d = $this->cache_get();
+			if ($d) return $d;
+		}
+
+		$src_img = $this->image->load();
 
 		// get image info - TODO: error handling
-		$size = getimagesize($this->file->path);
-		$exif = $this->get_exif();
+		$size = getimagesize($this->image->file->path);
+		$exif = $this->image->get_exif();
 
 		$src_width = $size[0];
 		$src_height = $size[1];
+		$max_width = $this->max_width;
+		$max_height = $this->max_height;
 
 		// shall be rotated? switch width/height temporarily and rotate after image has been scaled
 		$rotation = $exif->get_rotation();
@@ -444,19 +514,57 @@ class image
 		// catch output
 		ob_start();
 		ob_clean();
-		imagejpeg($new_img, null, $quality);
+		imagejpeg($new_img, null, $this->quality);
 		imagedestroy($new_img);
 
 		$data = ob_get_contents();
 		ob_clean();
 
+		// save cache
+		$this->cache_save($data);
+
 		return $data;
 	}
 
-	public function output_image($data)
+	public function output()
 	{
-		// TODO: cache headers etc.
-		header("Content-Type: image/jpeg");
-		echo $data;
+		$this->image->output_image($this->generate());
+	}
+
+	public function get_url()
+	{
+		return 'index.php?path='.urlencode($this->image->file->get_url()).'&mw='.$this->max_width.'&mh='.$this->max_height;
+	}
+
+	private function cache_get_path()
+	{
+		if ($this->cache_file) return $this->cache_file;
+		if (!gallery::$cache_path) return null;
+
+		$f = md5($this->image->file->path) . "-{$this->max_width}x{$this->max_height}_{$this->quality}.jpg";
+		$d = gallery::$cache_path . "/" . substr($f, 0, 1);
+
+		// create directory?
+		if (!file_exists($d))
+		{
+			gallery::cache_dir_create($d);
+		}
+
+		$this->cache_file = $d . "/" . $f;
+		return $this->cache_file;
+	}
+
+	private function cache_save($data)
+	{
+		$f = $this->cache_get_path();
+		file_put_contents($f, $data);
+	}
+
+	private function cache_get()
+	{
+		$f = $this->cache_get_path();
+		if (!file_exists($f)) return null;
+
+		return file_get_contents($f);
 	}
 }

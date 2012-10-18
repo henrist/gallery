@@ -8,7 +8,7 @@ if (!class_exists("hsw\gallery\gallery")) die("Are you sure you are at the right
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Gallery</title>
+	<title>HSw Gallery</title>
 	<style>
 
 	</style>
@@ -46,12 +46,13 @@ if (count($node->folders) == 0) {
 			break;
 		}
 
-		$thumb = $folder->get_thumbnail();
+		$folderimg = $folder->get_image();
 		
 		$t = 'none';
-		if ($thumb)
+		if ($folderimg)
 		{
-			$t = '<img src="'.htmlspecialchars($thumb->get_url()).'" alt="'.htmlspecialchars($thumb->file->getname()).'" />';
+			$thumb = $folderimg->get_thumb();
+			$t = '<img src="'.htmlspecialchars($thumb->get_url()).'" alt="'.htmlspecialchars($folderimg->file->getname()).'" />';
 		}
 
 		echo '
@@ -76,12 +77,11 @@ if (count($node->files) == 0) {
 			break;
 		}
 
-		$thumb = $file->image;
-		
 		$t = 'none';
-		if ($thumb)
+		if ($file->image)
 		{
-			$t = '<img src="'.htmlspecialchars($thumb->get_url()).'" alt="'.htmlspecialchars($thumb->file->getname()).'" />';
+			$thumb = $file->image->get_thumb();
+			$t = '<img src="'.htmlspecialchars($thumb->get_url()).'" alt="'.htmlspecialchars($file->getname()).'" />';
 		}
 
 		echo '
