@@ -79,8 +79,6 @@ else
 	$i = 0;
 	foreach ($node->files as $file)
 	{
-		if ($i++ == 50) break;
-
 		$img_url = '/resources/no-image.png';
 		$img_alt = $file->getname();
 		$link = $file->get_link();
@@ -106,12 +104,6 @@ else
 
 	echo '
 	</ul>';
-
-	if ($i == 50)
-	{
-		echo '
-	<p>Limited to 50 entries while testing...</p>';
-	}
 }
 
 
