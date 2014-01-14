@@ -23,7 +23,7 @@ Installation
 ------------
 
 * Pull from git
-* Change settings in config.php
+* Change settings in config.php (the web directory must currently not be in a subdirectory)
 * Create the directory 'cache' and make sure it is owned by the user running the php script or has chmod 777
 * Open your browser!
 
@@ -41,3 +41,6 @@ TODO
 * Support symlink paths
 * Pagination or another smart solution (viewing images as scrolled?)
 * Folder/file filtering
+* Optimized thumb creation
+* Access restriction using REMOTE_USER-env (both allow by deafult and deny by default)
+* Allow placing in a subdirectory
