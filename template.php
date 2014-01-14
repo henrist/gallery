@@ -9,7 +9,7 @@ echo '
 <html>
 <head>
 	<title>HSw Gallery</title>
-	<link type="text/css" href="gallery.css" media="all" rel="stylesheet" />
+	<link type="text/css" href="/gallery.css" media="all" rel="stylesheet" />
 	<script>
 	</script>
 </head>
@@ -38,7 +38,7 @@ if (count($node->folders) > 0)
 
 	foreach ($node->folders as $folder)
 	{
-		$img_url = 'resources/no-image.png';
+		$img_url = '/resources/no-image.png';
 		$img_alt = '';
 
 		$folderimg = $folder->get_image();
@@ -81,7 +81,7 @@ else
 	{
 		if ($i++ == 50) break;
 
-		$img_url = 'resources/no-image.png';
+		$img_url = '/resources/no-image.png';
 		$img_alt = $file->getname();
 		$link = $file->get_link();
 		$fullsize = '';

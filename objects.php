@@ -279,15 +279,12 @@ class folder
 
 	public function get_url()
 	{
-		return substr($this->path, strlen(gallery::$src_path)+1);
+		return '/'.substr($this->path, strlen(gallery::$src_path)+1);
 	}
 
 	public function get_link()
 	{
-		$url = $this->get_url();
-		if ($url == "") return 'index.php';
-
-		return 'index.php?path='.urlencode($url);
+		return $this->get_url();
 	}
 
 	/**
@@ -343,7 +340,7 @@ class file
 
 	public function get_url()
 	{
-		return substr($this->path, strlen(gallery::$src_path)+1);
+		return '/'.substr($this->path, strlen(gallery::$src_path)+1);
 	}
 
 	public static function strip_extension($name)
@@ -358,7 +355,7 @@ class file
 
 	public function get_link()
 	{
-		return gallery::$src_url . "/" . $this->get_url();
+		return gallery::$src_url . $this->get_url();
 	}
 
 	public function get_size($format = true)
@@ -402,7 +399,7 @@ class image
 
 	public function get_url($max_width = 300, $max_height = 480)
 	{
-		return 'index.php?path='.urlencode($this->file->get_url()).'&mw='.$max_width.'&mh='.$max_height;
+		return $this->file->get_url().'?mw='.$max_width.'&mh='.$max_height;
 	}
 
 	public function load()
@@ -534,7 +531,7 @@ class image_thumb
 
 	public function get_url()
 	{
-		return 'index.php?path='.urlencode($this->image->file->get_url()).'&mw='.$this->max_width.'&mh='.$this->max_height;
+		return $this->image->file->get_url().'?mw='.$this->max_width.'&mh='.$this->max_height;
 	}
 
 	private function cache_get_path()

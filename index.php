@@ -13,13 +13,12 @@ require "config.php";
 
 gallery::init();
 
-// default is root folder
-$path = "";
-
-// user-specified path
-if (isset($_GET['path']))
+// extract the path
+// default (if '') is root folder
+$path = urldecode($_SERVER['REQUEST_URI']);
+if (($pos = strpos($path, "?")) !== false)
 {
-	$path = $_GET['path'];
+	$path = substr($path, 0, $pos);
 }
 
 $node = gallery::parse_url($path);
