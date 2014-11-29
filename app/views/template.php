@@ -2,136 +2,125 @@
 
 use hsw\gallery\App;
 
-echo '
-<!DOCTYPE html>
-<html>
-<head>
-	<title>HSw Gallery</title>
-	<base href="'.htmlspecialchars(App::config('basepath')).'">
-	<link type="text/css" href="gallery.css" media="all" rel="stylesheet" />
-	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-	<script type="text/javascript">
-	var curPath = '.json_encode(App::config('basepath').$node->get_url()).';
-	$(function() {
-		$("#jumpFolder").change(function() {
-			window.location = curPath + (curPath.slice(-1) == "/" ? "" : "/") + $(this).val();
-		});
-	});
-	</script>
-</head>
-<body>
-	<h1>HSw Gallery</h1>';
-
-
 // generate hierarchy list
 $hierarchy = $node->get_parents();
 $hier = array();
 foreach ($hierarchy as $folder)
 {
-	$hier[] = '<a href="'.htmlspecialchars($folder->get_link()).'">'.htmlspecialchars($folder->getname()).'</a>';
+    $hier[] = '<a href="'.htmlspecialchars($folder->get_link()).'">'.htmlspecialchars($folder->getname()).'</a>';
 }
 $hier = implode(" &raquo; ", $hier);
 
-echo '
-	<p>Hierarchy: '.$hier.'</p>';
 
 
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HSw Gallery</title>
+    <base href="<?=htmlspecialchars(App::config('basepath'));?>">
+    <link type="text/css" href="gallery.css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript">
+    var curPath = <?=json_encode(App::config('basepath').$node->get_url());?>;
+    $(function() {
+        $("#jumpFolder").change(function() {
+            window.location = curPath + (curPath.slice(-1) == "/" ? "" : "/") + $(this).val();
+        });
+    });
+    </script>
+</head>
+<body>
+    <h1>HSw Gallery</h1>
 
-echo '
-	<select id="jumpFolder">
-		<option>Hopp til undermappe</option>';
+    <p>Hierarchy: <?=$hier;?></p>
 
-foreach ($node->getTreeStructure() as $path) {
-	echo '
-		<option value="'.htmlspecialchars($path).'">'.htmlspecialchars($path).'</option>';
-}
+    <select id="jumpFolder">
+        <option>Hopp til undermappe</option>
 
-echo '
-		</option>
-	</select>';
+        <?php foreach ($node->getTreeStructure() as $path): ?>
+            <option value="<?=htmlspecialchars($path);?>"><?=htmlspecialchars($path);?></option>
+        <?php endforeach; ?>
 
-
-
-if (count($node->folders) > 0)
-{
-	echo '
-	<ul class="folders">';
-
-	foreach ($node->folders as $folder)
-	{
-		$img_url = 'resources/no-image.png';
-		$img_alt = '';
-
-		$folderimg = $folder->get_image();
-		if ($folderimg)
-		{
-			$thumb = $folderimg->get_thumb();
-			$img_url = $thumb->get_url();
-			$img_alt = $folderimg->file->getname();
-		}
-
-		echo '
-		<li><a href="'.htmlspecialchars($folder->get_link()).'">
-				<img src="'.htmlspecialchars($img_url).'" alt="'.htmlspecialchars($img_alt).'" />
-				<span>'.htmlspecialchars($folder->getname()).'</span>
-		</a></li>';
-	}
-
-	echo '
-	</ul>';
-}
+    </select>
 
 
+    <?php if (count($node->folders) > 0): ?>
+        <ul class="folders">
+            <?php foreach ($node->folders as $folder):
+                $img_url = 'resources/no-image.png';
+                $img_alt = '';
 
-// no files to show?
-if (count($node->files) == 0) {
-	echo '
-	<div class="files_none">
-		<p>There are no files here.</p>
-	</div>';
-}
+                $folderimg = $folder->get_image();
+                if ($folderimg)
+                {
+                    $thumb = $folderimg->get_thumb();
+                    $img_url = $thumb->get_url();
+                    $img_alt = $folderimg->file->getname();
+                } ?>
 
-// show the files
-else
-{
-	echo '
-	<ul class="files">';
+                <li>
+                    <a href="<?=htmlspecialchars($folder->get_link());?>">
+                        <img src="<?=htmlspecialchars($img_url);?>" alt="<?=htmlspecialchars($img_alt);?>" />
+                        <span><?=htmlspecialchars($folder->getname());?></span>
+                    </a>
+                </li>
 
-	$i = 0;
-	foreach ($node->files as $file)
-	{
-		$img_url = 'resources/no-image.png';
-		$img_alt = $file->getname();
-		$link = $file->get_link();
-		$fullsize = '';
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
 
-		if ($file->image)
-		{
-			$thumb = $file->image->get_thumb();
-			$img_url = $thumb->get_url();
+    <?php
+    // no files to show?
+    if (count($node->files) == 0): ?>
+        <div class="files_none">
+            <p>There are no files here.</p>
+        </div>
 
-			// default link is smaller size than original
-			$fullsize = '
-				<span class="fullsizelink"><a href="'.htmlspecialchars($link).'">Original</a></span>';
-			$link = $file->image->get_thumb(1200, 1200, 90)->get_url();
-		}
+    <?php
+    // show the files
+    else: ?>
 
-		echo '<!--
-		--><li><a href="'.htmlspecialchars($link).'">
-				<img src="'.htmlspecialchars($img_url).'" alt="'.htmlspecialchars($img_alt).'" />
-				<span>'.htmlspecialchars($file->getname($file->image == false)).' ('.$file->get_size().')</span>
-		</a>'.$fullsize.'</li>';
-	}
+        <ul class="files">
 
-	echo '
-	</ul>';
-}
+            <?php
 
 
+            $i = 0;
+            foreach ($node->files as $file):
+                $img_url = 'resources/no-image.png';
+                $img_alt = $file->getname();
+                $link = $file->get_link();
+                $fullsize = '';
 
-echo '
-	<footer>
-		<p><a href="http://github.com/henrist/gallery">HSw Gallery</a> - made by <a href="http://hsw.no">Henrik Steen</a></p>
-	</footer>
+                if ($file->image)
+                {
+                    $thumb = $file->image->get_thumb();
+                    $img_url = $thumb->get_url();
+
+                    // default link is smaller size than original
+                    $fullsize = '
+                        <span class="fullsizelink"><a href="'.htmlspecialchars($link).'">Original</a></span>';
+                    $link = $file->image->get_thumb(1200, 1200, 90)->get_url();
+                }
+
+                ?><!--
+                --><li>
+                    <a href="<?=htmlspecialchars($link);?>">
+                        <img src="<?=htmlspecialchars($img_url);?>" alt="<?=htmlspecialchars($img_alt);?>" />
+                        <span><?=htmlspecialchars($file->getname($file->image == false));?> (<?=$file->get_size();?>)</span>
+                    </a>
+                    <?=$fullsize;?>
+                </li><?php
+
+            endforeach;
+            ?>
+
+        </ul>
+    <?php endif; ?>
+
+    <footer>
+        <p><a href="http://github.com/henrist/gallery">HSw Gallery</a> - made by <a href="http://hsw.no">Henrik Steen</a></p>
+    </footer>
 </body>
-</html>';
+</html>
