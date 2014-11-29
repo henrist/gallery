@@ -1,15 +1,14 @@
 <?php
 
-namespace hsw\gallery;
-
-if (!class_exists("hsw\gallery\gallery")) die("Are you sure you are at the right address?");
+use hsw\gallery\App;
 
 echo '
 <!DOCTYPE html>
 <html>
 <head>
 	<title>HSw Gallery</title>
-	<link type="text/css" href="/gallery.css" media="all" rel="stylesheet" />
+	<base href="'.htmlspecialchars(App::config('basepath')).'">
+	<link type="text/css" href="gallery.css" media="all" rel="stylesheet" />
 	<script>
 	</script>
 </head>
@@ -38,7 +37,7 @@ if (count($node->folders) > 0)
 
 	foreach ($node->folders as $folder)
 	{
-		$img_url = '/resources/no-image.png';
+		$img_url = 'resources/no-image.png';
 		$img_alt = '';
 
 		$folderimg = $folder->get_image();
@@ -79,7 +78,7 @@ else
 	$i = 0;
 	foreach ($node->files as $file)
 	{
-		$img_url = '/resources/no-image.png';
+		$img_url = 'resources/no-image.png';
 		$img_alt = $file->getname();
 		$link = $file->get_link();
 		$fullsize = '';

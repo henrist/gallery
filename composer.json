@@ -1,0 +1,18 @@
+{
+    "name": "hsw/gallery",
+    "description": "Simple file-based gallery",
+    "authors": [
+        {
+            "name": "Henrik Steen",
+            "email": "henrist@henrist.net"
+        }
+    ],
+    "require": {
+
+    },
+    "autoload": {
+        "psr-4": {
+            "hsw\\gallery\\": "app/src"
+        }
+    }
+}
