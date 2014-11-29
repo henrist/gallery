@@ -11,7 +11,8 @@ foreach ($hierarchy as $folder)
 }
 $hier = implode(" &raquo; ", $hier);
 
-
+// contents from HEADER.html
+$header = $node->getHeader();
 
 ?>
 <!DOCTYPE html>
@@ -41,9 +42,13 @@ $hier = implode(" &raquo; ", $hier);
         <?php foreach ($node->getTreeStructure() as $path): ?>
             <option value="<?=htmlspecialchars($path);?>"><?=htmlspecialchars($path);?></option>
         <?php endforeach; ?>
-
     </select>
 
+    <?php if ($header != ''): ?>
+        <div class="header">
+            <?=$header;?>
+        </div>
+    <?php endif; ?>
 
     <?php if (count($node->folders) > 0): ?>
         <ul class="folders">

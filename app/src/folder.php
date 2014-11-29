@@ -191,4 +191,17 @@ class folder
         sort($result);
         return $result;
     }
+
+    /**
+     * Get contents of HEADER.html-file, if exists
+     *
+     * @return string
+     */
+    public function getHeader()
+    {
+        $p = $this->path . '/HEADER.html';
+        if (is_file($p))
+            return file_get_contents($p);
+        return '';
+    }
 }
