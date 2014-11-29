@@ -54,24 +54,12 @@ class App {
 
         gallery::init();
 
-        // extract the path
-        // default (if '') is root folder
-        $path = urldecode($_SERVER['REQUEST_URI']);
-        if (($pos = strpos($path, "?")) !== false)
-        {
-            $path = substr($path, 0, $pos);
-        }
-
-        $path = substr($path, 9);
+        $path = $this->getRelativeUrl();
 
         $node = gallery::parse_url($path);
-        if (!$node)
-        {
-            gallery::error("Could not find specified path.");
-        }
 
         // file?
-        if (get_class($node) == "hsw\\gallery\\file")
+        if ($node instanceof file)
         {
             // no image?
             if (!$node->image) die("No image.");
@@ -92,15 +80,51 @@ class App {
             $mh = isset($_GET['mh']) && is_numeric($_GET['mh']) && $_GET['mh'] > 0 && $_GET['mh'] < 3000 ? $_GET['mh'] : 480;
             $node->image->get_thumb($mw, $mh)->output();
             die;
-
-            // TODO
-            die("File handling is under development..");
         }
 
         // folder
-        $node->load_contents();
+        elseif ($node instanceof folder)
+        {
+            if (isset($_GET['tree']))
+            {
+                echo json_encode($node->getTreeStructure());
+                die;
+            }
+
+            $node->load_contents();
+        }
+
+        // not found
+        else
+        {
+            gallery::error("Could not find specified path.");
+        }
 
         // load template
         require "views/template.php";
+    }
+
+    /**
+     * Get the relative url for the current request
+     *
+     * Throws exception if invalid path
+     */
+    private function getRelativeUrl() {
+        $path = urldecode($_SERVER['REQUEST_URI']);
+        if (($pos = strpos($path, "?")) !== false)
+        {
+            $path = substr($path, 0, $pos);
+        }
+
+        $base = static::config('basepath');
+        if (substr($path, 0, strlen($base)) != $base) {
+            throw new \Exception("Path does not match base path!");
+        }
+
+        $path = substr($path, strlen($base));
+        if ($path === false) $path = "";
+        if (substr($base, -1) == "/") $path = "/".$path;
+
+        return $path;
     }
 }

@@ -101,3 +101,9 @@ a:hover {
 	/*position: absolute;*/
 	display: inline;
 }
+
+select {
+	background-color: #222;
+	color: #AAA;
+	border-color: #444;
+}

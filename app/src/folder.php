@@ -25,7 +25,7 @@ class folder
     private static function get_dh($path)
     {
         $dh = opendir($path);
-        if (!$dh) throw new Exception("Could not open directory: $this->path");
+        if (!$dh) throw new Exception("Could not open directory: $path");
 
         return $dh;
     }
@@ -141,7 +141,7 @@ class folder
 
     public function get_url()
     {
-        return substr($this->path, strlen(App::config('src_path'))+1);
+        return (string)substr($this->path, strlen(App::config('src_path'))+1);
     }
 
     public function get_link()
@@ -165,5 +165,30 @@ class folder
         }
 
         return array_reverse($hierarchy);
+    }
+
+    /**
+     * Get tree structure of subdirectories
+     *
+     * @return array
+     */
+    public function getTreeStructure()
+    {
+        $result = array();
+        $search = function($folder, $prefix) use (&$result, &$search)
+        {
+            foreach (new \DirectoryIterator($folder) as $node)
+            {
+                if ($node->isDir() && !$node->isDot())
+                {
+                    $result[] = $prefix.$node->getFilename();
+                    $search($node->getPathname(), $prefix.$node->getFilename().'/');
+                }
+            }
+        };
+
+        $search($this->path, "");
+        sort($result);
+        return $result;
     }
 }

@@ -9,7 +9,14 @@ echo '
 	<title>HSw Gallery</title>
 	<base href="'.htmlspecialchars(App::config('basepath')).'">
 	<link type="text/css" href="gallery.css" media="all" rel="stylesheet" />
-	<script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript">
+	var curPath = '.json_encode(App::config('basepath').$node->get_url()).';
+	$(function() {
+		$("#jumpFolder").change(function() {
+			window.location = curPath + (curPath.slice(-1) == "/" ? "" : "/") + $(this).val();
+		});
+	});
 	</script>
 </head>
 <body>
@@ -27,6 +34,21 @@ $hier = implode(" &raquo; ", $hier);
 
 echo '
 	<p>Hierarchy: '.$hier.'</p>';
+
+
+
+echo '
+	<select id="jumpFolder">
+		<option>Hopp til undermappe</option>';
+
+foreach ($node->getTreeStructure() as $path) {
+	echo '
+		<option value="'.htmlspecialchars($path).'">'.htmlspecialchars($path).'</option>';
+}
+
+echo '
+		</option>
+	</select>';
 
 
 
