@@ -24,8 +24,9 @@ Installation
 ------------
 
 * Pull from git
-* Change settings in config.php (the web directory must currently not be in a subdirectory)
-* Create the directory 'cache' and make sure it is owned by the user running the php script or has chmod 777
+* Change settings in `app/config.php`
+* Adjust `public/.htaccess` (if not using Apache, make sure index.php receives 404 pages)
+* Create the directory `cache` and make sure it is owned by the user running the php script or has chmod 777
 * Run `composer install`
 * Open your browser!
 
