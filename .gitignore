@@ -1,3 +1,7 @@
 cache/
 
 /vendor/
+
+# IDEA-project-files
+*.iml
+.idea/
