@@ -38,6 +38,9 @@ class gallery
     public static function parse_url($url)
     {
         $s = realpath(App::config('src_path') . "/" . $url);
+        if ($s === false) {
+            return false;
+        }
 
         // check for invalid paths
         if (substr($s, 0, strlen(App::config('src_path'))) != App::config('src_path')) return false; // hack attempt?
