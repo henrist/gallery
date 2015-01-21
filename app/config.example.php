@@ -8,7 +8,7 @@ return array(
     'src_url' => '/foreningen/Grupper/UKA/Mediearkiv',
 
     // the path on the server the app is running
-    'basepath' => '/ukefiler/',
+    'basepath' => '/', # eg: /ukefiler/
 
     // folder used to store cache
     'cache_path' => __DIR__."/../cache"

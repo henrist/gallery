@@ -5,3 +5,6 @@ cache/
 # IDEA-project-files
 *.iml
 .idea/
+
+# Local configuration
+app/config.php
