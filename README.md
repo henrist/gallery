@@ -1,28 +1,18 @@
-Gallery
-=======
-
+# Gallery
 Under development...
 
 Feel free to provide a pull request.
 
-
-Introduction
-------------
-
+## Introduction
 This application is a simple gallery for viewing images stored on disk without any database.
 
-
-Requirements
-------------
-
+## Requirements
 * PHP 5.3
 * Composer
 * exif-support
+* gd
 
-
-Installation
-------------
-
+## Installation
 * Pull from git
 * Change settings in `app/config.php`
 * Adjust `public/.htaccess` (if not using Apache, make sure index.php receives 404 pages)
@@ -30,10 +20,10 @@ Installation
 * Run `composer install`
 * Open your browser!
 
+## Testserver
+* You can also test this by going to `public` folder and running `php -S 0.0.0.0:8080 index.php` and then going to http://servername:8080/
 
-TODO
-----
-
+## TODO
 * Basic html+css page
 * Deleting old cache not in use
 * Showing description for a folder (where you can put credits etc)
